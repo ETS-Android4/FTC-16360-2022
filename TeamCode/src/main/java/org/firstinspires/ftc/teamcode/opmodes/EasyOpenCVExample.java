@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 //@Disabled
 public class EasyOpenCVExample extends OpMode {
 
-    Vision vision;
+    //Vision vision;
 
     @Override
     public void init() {
-        vision = new Vision(hardwareMap);
+        //vision = new Vision(hardwareMap);
     }
 
     @Override

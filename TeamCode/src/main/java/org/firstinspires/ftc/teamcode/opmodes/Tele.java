@@ -36,8 +36,6 @@ public class Tele extends LinearOpMode {
             robot.update();
 
             //Telemetry
-            telemetry.addData("robot state", robot.getRobotState());
-            telemetry.addData("alliance", Globals.alliance);
             telemetry.update();
         }
     }
