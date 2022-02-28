@@ -19,8 +19,10 @@ import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
 @TeleOp(group = "advanced", name = "test")
 
 public class Test extends LinearOpMode {
-    private Robot robot;
-    private Vision vision;
+
+    private DcMotor slides;
+
+    private DcMotor intake;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -28,7 +30,12 @@ public class Test extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // initialize robot
-        robot = new Robot(hardwareMap);
+        slides = hardwareMap.get(DcMotor.class, "slides");
+        slides.setTargetPosition(0);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
 
@@ -40,10 +47,32 @@ public class Test extends LinearOpMode {
                 module.clearBulkCache();
             }
 
-            //telemetry.addLine(vision.getBarcodePosition().name());
-            telemetry.addData("motorPos", robot.arm.motor.getCurrentPosition());
+            if (gamepad1.a) {
+                slides.setPower(1);
+                slides.setTargetPosition(-770);
+            }
+            if (gamepad1.b) {
+                slides.setPower(0.8);
+                slides.setTargetPosition(0);
+            }
+            if (gamepad1.x) {
+                slides.setPower(1);
+                slides.setTargetPosition(-220);
+            }
 
-            telemetry.addData("position", robot.drive.getPoseEstimate());
+            if (gamepad1.left_bumper) {
+                intake.setPower(1);
+            }
+            if (gamepad1.right_bumper) {
+                intake.setPower(-1);
+            }
+            if (gamepad1.left_stick_button) {
+                intake.setPower(0);
+            }
+
+
+            //telemetry.addLine(vision.getBarcodePosition().name());
+            telemetry.addData("position", slides.getCurrentPosition());
             telemetry.update();
         }
     }
