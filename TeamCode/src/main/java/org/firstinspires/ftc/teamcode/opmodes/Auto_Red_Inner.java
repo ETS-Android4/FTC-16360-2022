@@ -20,19 +20,25 @@ public class Auto_Red_Inner extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // initialize auto
-        base = new Auto_Base(hardwareMap, telemetry);
-        base.startPos = Auto_Base.StartPos.RED_INNER;
+        base = new Auto_Base(hardwareMap, telemetry, Auto_Base.StartPos.RED_INNER);
+
+        while(!isStarted() && !isStopRequested()) {
+            telemetry.addData("pp", base.vision.getBarcodePosition());
+            telemetry.update();
+        }
 
         waitForStart();
 
         if (isStopRequested()) return;
 
-        // clear cache for bulk reading
-        for (LynxModule module : this.hardwareMap.getAll(LynxModule.class)) {
-            module.clearBulkCache();
-        }
+        while(opModeIsActive() && !isStopRequested()) {
+            // clear cache for bulk reading
+            for (LynxModule module : this.hardwareMap.getAll(LynxModule.class)) {
+                module.clearBulkCache();
+            }
 
-        base.update();
+            base.update();
+        }
     }
     //Globals.currentPose = base.robot.drive.getPoseEstimate();
 }

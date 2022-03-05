@@ -39,7 +39,7 @@ public class Vision {
             @Override
             public void onOpened()
             {
-                phoneCam.startStreaming(320,240, OpenCvCameraRotation.UPSIDE_DOWN);
+                phoneCam.startStreaming(432,240, OpenCvCameraRotation.UPSIDE_DOWN);
             }
 
             @Override
@@ -50,7 +50,6 @@ public class Vision {
     }
 
     public Globals.BarcodePos getBarcodePosition() {
-        //pipeline.processFrame(M);
         switch(pipeline.position) {
             case TOP:
                 return Globals.BarcodePos.TOP;
