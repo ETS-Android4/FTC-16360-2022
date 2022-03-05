@@ -33,6 +33,7 @@ public class Box {
     public Box(HardwareMap hardwareMap) {
         swing1 = hardwareMap.get(Servo.class, "swing1");
         swing2 = hardwareMap.get(Servo.class, "swing2");
+        sensor = hardwareMap.get(Rev2mDistanceSensor.class, "sensor");
     }
 
     public void extend() {

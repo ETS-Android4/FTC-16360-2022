@@ -74,12 +74,6 @@ public class Auto_Base_New{
         // Initialize the robot class
         robot = new Robot(hardwareMap);
 
-        //set arm to idle and close hand
-        robot.arm.armState = Arm.StateArm.FRONT;
-        robot.arm.handState = Arm.StateHand.CLOSED;
-        robot.update();
-        robot.arm.forceReset();
-
         // Initialize the vision Class ToDo
         vision = new Vision(hardwareMap);
 

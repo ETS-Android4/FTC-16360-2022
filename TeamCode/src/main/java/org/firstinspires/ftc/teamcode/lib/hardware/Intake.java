@@ -25,8 +25,8 @@ public class Intake {
     public Intake(HardwareMap hardwareMap) {
         motorFront = hardwareMap.get(DcMotorEx.class, "intakeFront");
         motorRear = hardwareMap.get(DcMotorEx.class, "intakeRear");
-        rear = hardwareMap.get(Servo.class, "rear");
-        front = hardwareMap.get(Servo.class, "front");
+        rear = hardwareMap.get(Servo.class, "intakeRear");
+        front = hardwareMap.get(Servo.class, "intakeFront");
 
         singleMotor = motorRear;
         state = State.OFF;
