@@ -14,15 +14,22 @@ import java.util.Timer;
 
 public class Slides {
 
-    enum State {
+    public enum State {
         MAX,
-        ZERO
+        ZERO,
+        MIN,
+        MEDIUM
     }
 
-    DcMotorEx motor;
+    public DcMotorEx motor;
 
-    int motor_extended = 770;
-    int motor_retracted = 0;
+    final int motor_max = 770;
+    final int motor_medium = 770;
+    final int motor_min = 770;
+    final int motor_retracted = 0;
+    public int offset = 0;
+    public double speed = 0;
+    public State extendedPos = State.MAX;
 
 
     public Slides(HardwareMap hardwareMap) {
@@ -33,13 +40,34 @@ public class Slides {
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void extend() {
+        setpos(extendedPos);
+    }
+
+    public void retract() {
+        setpos(State.ZERO);
+    }
+
+    public void setExtendedPos(State pos) {
+        extendedPos = pos;
+    }
+
     public void setpos(State state) {
         switch (state) {
             case MAX:
-                motor.setTargetPosition(motor_extended);
+                motor.setTargetPosition(motor_max + offset);
+                break;
             case ZERO:
-                motor.setTargetPosition(motor_retracted);
+                motor.setTargetPosition(motor_retracted + offset);
+                break;
+            case MEDIUM:
+                motor.setTargetPosition(motor_medium + offset);
+                break;
+            case MIN:
+                motor.setTargetPosition(motor_min + offset);
+                break;
         }
+        motor.setPower(speed);
     }
 
     public void update() {

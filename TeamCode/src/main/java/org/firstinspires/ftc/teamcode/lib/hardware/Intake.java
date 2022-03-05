@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.lib.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -40,13 +41,23 @@ public class Intake {
         state = State.OFF;
     }
 
+    public void toggleState() {
+        if (state == State.ON) {
+            state = State.OFF;
+        } else {
+            state = State.ON;
+        }
+    }
+
     public void update() {
         switch (state) {
             case ON:
                 singleMotor.setPower(speed);
+                singleMotor.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
             case OFF:
-                singleMotor.setPower(0);
+                singleMotor.setPower(speed/6);
+                singleMotor.setDirection(DcMotorSimple.Direction.REVERSE);
                  break;
         }
     }

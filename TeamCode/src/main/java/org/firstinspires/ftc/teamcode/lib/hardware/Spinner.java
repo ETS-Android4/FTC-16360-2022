@@ -33,6 +33,14 @@ public class Spinner {
         state = State.IDLE;
     }
 
+    public void toggleState() {
+        if (state == State.IDLE) {
+            state = State.SPINNING;
+        } else {
+            state = State.IDLE;
+        }
+    }
+
     public void update() {
         switch (state) {
             case IDLE:

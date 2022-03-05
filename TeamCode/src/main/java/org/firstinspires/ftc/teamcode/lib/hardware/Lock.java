@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.lib.Globals;
 
 public class Lock {
 
-    enum State {
+    public enum State {
         LEFT,
         RIGHT,
         NEUTRAL,
@@ -22,6 +22,7 @@ public class Lock {
     private double lock_left = 0;
     private double lock_right = 1;
     private double lock_intaking;
+    public State depositDirection = State.LEFT;
 
     public Lock(HardwareMap hardwareMap) {
         lock   = hardwareMap.get(Servo.class, "lock");

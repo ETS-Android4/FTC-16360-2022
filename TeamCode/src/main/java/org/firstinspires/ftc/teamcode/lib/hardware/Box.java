@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.lib.hardware;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.lib.Globals;
 
 public class Box {
@@ -15,6 +18,7 @@ public class Box {
 
     Servo swing1;
     Servo swing2;
+    Rev2mDistanceSensor sensor;
 
 
     private State state = State.RETRACTED;
@@ -23,6 +27,7 @@ public class Box {
     private double swing2_In = 0;
     private double swing2_Out = 1;
     boolean ready = true;
+    public boolean full = false;
     ElapsedTime timer;
 
     public Box(HardwareMap hardwareMap) {
@@ -55,6 +60,11 @@ public class Box {
         }
         if (timer.milliseconds() > 10) {
             ready = true;
+        }
+        if (sensor.getDistance(DistanceUnit.CM) < 2) {
+            full = true;
+        } else {
+            full = false;
         }
     }
 }
