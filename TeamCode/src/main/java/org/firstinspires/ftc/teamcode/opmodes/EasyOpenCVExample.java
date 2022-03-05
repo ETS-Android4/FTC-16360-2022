@@ -9,11 +9,11 @@ import org.firstinspires.ftc.teamcode.lib.Vision;
 //@Disabled
 public class EasyOpenCVExample extends OpMode {
 
-    Vision vision;
+    //Vision vision;
 
     @Override
     public void init() {
-        vision = new Vision(hardwareMap);
+        //vision = new Vision(hardwareMap);
     }
 
     @Override

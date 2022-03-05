@@ -8,7 +8,6 @@ public class Spinner {
     HardwareMap hardwareMap;
     enum State {
         SPINNING,
-        REVERSED,
         IDLE
     }
     public State state;
@@ -24,35 +23,31 @@ public class Spinner {
 
         //set inital state
         state = State.IDLE;
-        motor.setTargetPosition(motor.getCurrentPosition());
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setSpinning() {
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         state = State.SPINNING;
     }
 
     public void setIdle() {
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         state = State.IDLE;
     }
 
-    public void setReversed() {
-        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        state = State.REVERSED;
+    public void toggleState() {
+        if (state == State.IDLE) {
+            state = State.SPINNING;
+        } else {
+            state = State.IDLE;
+        }
     }
 
     public void update() {
         switch (state) {
             case IDLE:
-                motor.setTargetPosition(motor.getCurrentPosition());
+                motor.setPower(0);
                 break;
             case SPINNING:
-                motor.setPower(0.3);
-                break;
-            case REVERSED:
-                motor.setPower(-0.3);
+                motor.setPower(0.15);
                 break;
         }
     }

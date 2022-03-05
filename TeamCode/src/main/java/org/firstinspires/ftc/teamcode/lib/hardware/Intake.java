@@ -1,50 +1,64 @@
 package org.firstinspires.ftc.teamcode.lib.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private boolean enabled;
-    private DcMotorEx motor;
-
-    public enum StateIntake{
+    enum State {
         ON,
-        IDLE,
-        REVERSE
+        OFF
     }
 
-    public StateIntake intakeState;
+    DcMotorEx motorFront;
+    DcMotorEx motorRear;
+
+    DcMotorEx singleMotor;
+
+    Servo rear;
+    Servo front;
+    double speed = 0.8;
+    State state;
+
     public Intake(HardwareMap hardwareMap) {
-        enabled = false;
-        motor = hardwareMap.get(DcMotorEx.class, "Intake");
-        intakeState = StateIntake.IDLE;
+        motorFront = hardwareMap.get(DcMotorEx.class, "intakeFront");
+        motorRear = hardwareMap.get(DcMotorEx.class, "intakeRear");
+        rear = hardwareMap.get(Servo.class, "rear");
+        front = hardwareMap.get(Servo.class, "front");
+
+        singleMotor = motorRear;
+        state = State.OFF;
+
     }
 
-    public void toggle() {
-        enabled = !enabled;
+    public void enable() {
+        state = State.ON;
+    }
+
+    public void disable() {
+        state = State.OFF;
+    }
+
+    public void toggleState() {
+        if (state == State.ON) {
+            state = State.OFF;
+        } else {
+            state = State.ON;
+        }
     }
 
     public void update() {
-        /*
-        if(enabled) {
-            motor.setPower(0.5);
-        } else {
-            motor.setPower(0);
-        }
-         */
-        switch (intakeState){
+        switch (state) {
             case ON:
-                motor.setPower(0.45);
+                singleMotor.setPower(speed);
+                singleMotor.setDirection(DcMotorSimple.Direction.FORWARD);
                 break;
-            case IDLE:
-                motor.setPower(0);
-                break;
-            case REVERSE:
-                motor.setPower((-0.45));
-                break;
+            case OFF:
+                singleMotor.setPower(speed/6);
+                singleMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+                 break;
         }
-
     }
-
 }
