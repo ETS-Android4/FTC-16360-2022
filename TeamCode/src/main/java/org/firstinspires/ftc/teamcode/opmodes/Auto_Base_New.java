@@ -49,6 +49,8 @@ public class Auto_Base_New{
     // Declare our start pose
     Pose2d startPose;
 
+    Pose2d takeinPose;
+
     // robot class
     Robot robot;
 
@@ -65,7 +67,7 @@ public class Auto_Base_New{
     Telemetry telemetry;
 
     //Trajectories
-    Trajectory startToDuck, duckToDeposit, depostToTakein, takeinToDeposit;
+    Trajectory startToDuck, duckToDeposit, depostToPark, takeinToDeposit;
     public Auto_Base_New(HardwareMap hardwareMap, Telemetry telemetry, StartPos startPos){
         //copy telemetry, startPos
         this.telemetry = telemetry;
@@ -114,11 +116,11 @@ public class Auto_Base_New{
                 .lineToLinearHeading(new Pose2d(-62.4, 20, Math.toRadians(270)))
                 .build();
 
-        depostToTakein = robot.drive.trajectoryBuilder(duckToDeposit.end())
-                .lineTo(new Vector2d(-62.4, 20))// Y koordinate stimmt nöd!!!
-                .build();
+       depostToPark = robot.drive.trajectoryBuilder(takeinToDeposit.end())
+               .lineTo(new Vector2d(-62.4, 20))//Y stimmt nonig!!!!!
+               .build();
 
-        takeinToDeposit = robot.drive.trajectoryBuilder(depostToTakein.end())
+        takeinToDeposit = robot.drive.trajectoryBuilder(takeinPose) ///eifach endposition vom hindere Fahre, ich weiss nonig wie das gaht
                 .lineTo(new Vector2d(-62.4, 20))//Y stimmt nöd!!!!
                 .build();
 
@@ -153,23 +155,23 @@ public class Auto_Base_New{
                 break;
             case DEPOSIT:
                 // arm usefahre und denn ablade uf de richtige höchi
-                if (waitTimer.seconds() < 25){
-                    currentState = State.INTAKE_ON;
+                if (waitTimer.seconds() < 25) {
+                    currentState = State.DEPOSIT_TO_TAKEIN;
                 }
                 else{
                     currentState = State.PARK;
                 }
                 break;
-            case INTAKE_ON:
-                // intake aschalte und fürefahre
-                currentState = State.DEPOSIT_TO_TAKEIN;
-                break;
             case DEPOSIT_TO_TAKEIN:
-                robot.drive.followTrajectoryAsync(depostToTakein);
+                // intake aschalte und fürefahre
+                robot.drive.setMotorPowers(10, 10, 10, 10); // stimmt no gar nonig
                 currentState = State.TAKE_IN;
                 break;
+
             case TAKE_IN:
                 //intake bis öppis drin isch
+                robot.drive.setMotorPowers(0,0,0,0);
+                takeinPose = robot.drive.getPoseEstimate();
                 currentState = State.TAKEIN_TO_DEPOSIT;
                 break;
             case TAKEIN_TO_DEPOSIT:
@@ -177,7 +179,7 @@ public class Auto_Base_New{
                 currentState=State.DEPOSIT;
                 break;
             case PARK:
-                robot.drive.followTrajectoryAsync(depostToTakein);
+                robot.drive.followTrajectoryAsync(depostToPark);
                 break;
         }
 
