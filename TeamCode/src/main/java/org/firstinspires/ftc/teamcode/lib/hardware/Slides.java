@@ -35,6 +35,7 @@ public class Slides {
 
     public Slides(HardwareMap hardwareMap) {
         motor = hardwareMap.get(DcMotorEx.class, "slides");
+        motor.setTargetPosition(0);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }

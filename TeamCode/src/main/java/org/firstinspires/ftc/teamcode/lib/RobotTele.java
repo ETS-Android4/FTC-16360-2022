@@ -72,7 +72,7 @@ public class RobotTele extends Robot {
             intake.toggleState();
         }
         if(controller2.getdPadRight() == Controller.ButtonState.ON_PRESS) {
-            spinner.toggleState();
+            //spinner.toggleState();
         }
         if(controller2.getRightJoystickButton() == Controller.ButtonState.ON_PRESS &&
                 controller2.getLeftJoystickButton() == Controller.ButtonState.ON_PRESS) {

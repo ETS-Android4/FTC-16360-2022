@@ -18,24 +18,22 @@ import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
 
 
 @TeleOp(group = "advanced", name = "test")
-
 public class Test extends LinearOpMode {
 
-    private DcMotor slides;
-
-    private DcMotor intake;
-
     private ElapsedTime runtime = new ElapsedTime();
+    public Robot robot;
+    public Controller controller1;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Robot robot = new Robot(hardwareMap);
-        Controller controller1 = new Controller(gamepad1);
-
-        robot.slides.speed = 0.8;
+        robot = new Robot(hardwareMap);
+        boolean b = false;
+        int i = 0;
+        controller1 = new Controller(gamepad1);
 
         waitForStart();
+        robot.slides.motor.setPower(0.8);
 
         if (isStopRequested()) return;
 
@@ -74,12 +72,23 @@ public class Test extends LinearOpMode {
                 robot.box.swing1.setPosition(0);
                 robot.box.swing2.setPosition(0);
             }
+            if (controller1.getRightBumper() == Controller.ButtonState.ON_PRESS) {
+                robot.slides.motor.setTargetPosition(0);
+            }
+            if (gamepad1.a) {
+                robot.slides.motor.setTargetPosition(300);
+            }
+            i++;
 
 
             //telemetry.addLine(vision.getBarcodePosition().name());
             telemetry.addData("sensor Distance: ", robot.box.sensor.getDistance(DistanceUnit.CM));
             telemetry.addData("slides Position: ", robot.slides.motor.getCurrentPosition());
+            telemetry.addData("slides Target: ", robot.slides.motor.getTargetPosition());
+            telemetry.addData("i: ",i);
+            telemetry.addData("joystick: ", controller1.getLeftJoystickXValue());
             telemetry.update();
+            controller1.update();
         }
     }
 }
