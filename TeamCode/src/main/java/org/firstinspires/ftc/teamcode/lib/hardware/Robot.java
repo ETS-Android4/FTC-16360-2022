@@ -77,18 +77,28 @@ public class Robot {
                 lock.state = Lock.State.NEUTRAL;
                 if (slides.motor.getCurrentPosition() > 10) {
                     box.extend();
+                } else {
+                    box.transport();
+                }
+                if (slides.motor.getCurrentPosition() >= slides.motor.getTargetPosition()) {
+                    state = State.DRIVING;
                 }
                 break;
 
             case RETRACTING:
                 lock.state = Lock.State.NEUTRAL;
                 slides.speed = 0.8;
-                box.retract();
+                box.transport();
                 if (box.ready) {
                     slides.retract();
                 }
-                if (slides.motor.getCurrentPosition() <= 10 && automation) {
-                    state = State.INTAKING;
+                if (slides.motor.getCurrentPosition() <= 10) {
+                    if (automation) {
+                        state = State.INTAKING;
+                    } else {
+                        state = State.DRIVING;
+                    }
+                    box.retract();
                 }
                 break;
 
@@ -118,5 +128,6 @@ public class Robot {
         box.update();
         lock.update();
         intake.update();
+        slides.update();
     }
 }

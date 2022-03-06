@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.Globals;
 import org.firstinspires.ftc.teamcode.lib.Vision;
-import org.firstinspires.ftc.teamcode.lib.hardware.Arm;
 import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
 
 //@Disabled
@@ -75,10 +74,10 @@ public class Auto_Base{
         robot = new Robot(hardwareMap);
 
         //set arm to idle and close hand
-        robot.arm.armState = Arm.StateArm.FRONT;
-        robot.arm.handState = Arm.StateHand.CLOSED;
-        robot.update();
-        robot.arm.forceReset();
+        //robot.arm.armState = Arm.StateArm.FRONT;
+        //robot.arm.handState = Arm.StateHand.CLOSED;
+        //robot.update();
+        //robot.arm.forceReset();
 
         // Initialize the vision Class ToDo
         vision = new Vision(hardwareMap);
@@ -91,7 +90,8 @@ public class Auto_Base{
 
         /*
          **  Trajectories
-         */
+        */
+
         switch (startPos) {
             case RED_INNER:
                 startPose = new Pose2d(62.4, 78.5, Math.toRadians(180));
@@ -160,19 +160,19 @@ public class Auto_Base{
                     //quality code right here
                 switch (barcodePos) {
                     case TOP:
-                        robot.arm.armState = Arm.StateArm.TOP;
+                        //robot.arm.armState = Arm.StateArm.TOP;
                         break;
                     case MIDDLE:
-                        robot.arm.armState = Arm.StateArm.MIDDLE;
+                        //robot.arm.armState = Arm.StateArm.MIDDLE;
                         break;
                     case BOTTOM:
-                        robot.arm.armState = Arm.StateArm.BOTTOM;
+                        //robot.arm.armState = Arm.StateArm.BOTTOM;
                 }
                 break;
 
             case DEPOSIT_BLOCK:
                 if(!robot.drive.isBusy()) {
-                    robot.arm.handState = Arm.StateHand.OPEN;
+                    //robot.arm.handState = Arm.StateHand.OPEN;
                     if (startPos == StartPos.BLUE_INNER || startPos == StartPos.RED_INNER) {// if we started inner
                         currentState = State.SHUB_TO_BARRIER;
                     } else {
@@ -191,7 +191,7 @@ public class Auto_Base{
 
             case BARRIER_TO_WAREHOUSE:
                 if(!robot.drive.isBusy()) {
-                    robot.arm.armState = Arm.StateArm.FRONT;
+                    //robot.arm.armState = Arm.StateArm.FRONT;
                     robot.drive.followTrajectoryAsync(barrierToWarehouse);
                     currentState = State.IDLE;
                 }
@@ -208,8 +208,8 @@ public class Auto_Base{
             case SHUB_TO_DUCK:
                 if(waitTimer.milliseconds() > 750) {
                     currentState = State.SPIN_DUCK;
-                    robot.arm.motor.setPower(1);
-                    robot.arm.armState = Arm.StateArm.FRONT;
+                    //robot.arm.motor.setPower(1);
+                    //robot.arm.armState = Arm.StateArm.FRONT;
                 }
 
             case SPIN_DUCK:
@@ -222,7 +222,7 @@ public class Auto_Base{
             case SPINNING:
                 if(waitTimer.seconds() > 2) {
                     if (startPos == StartPos.RED_OUTER) {
-                        robot.spinner.setReversed();
+                        //robot.spinner.setReversed();
                     } else {
                         robot.spinner.setIdle();
                     }
@@ -249,7 +249,7 @@ public class Auto_Base{
         telemetry.addData("y", poseEstimate.getY());
         telemetry.addData("heading", poseEstimate.getHeading());
         telemetry.addData("position", barcodePos);
-        telemetry.addData("armPos", robot.arm.armState);
+        //telemetry.addData("armPos", robot.arm.armState);
         telemetry.addData("state", currentState);
         telemetry.update();
     }

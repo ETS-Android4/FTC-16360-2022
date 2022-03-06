@@ -8,6 +8,93 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.checkerframework.checker.units.qual.C;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.lib.Controller;
+import org.firstinspires.ftc.teamcode.lib.Globals;
+import org.firstinspires.ftc.teamcode.lib.RobotTele;
+import org.firstinspires.ftc.teamcode.lib.Vision;
+import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
+
+
+@TeleOp(group = "advanced", name = "test")
+
+public class Test extends LinearOpMode {
+
+    private DcMotor slides;
+
+    private DcMotor intake;
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        Robot robot = new Robot(hardwareMap);
+        Controller controller1 = new Controller(gamepad1);
+
+        robot.slides.speed = 0.8;
+
+        waitForStart();
+
+        if (isStopRequested()) return;
+
+        while (opModeIsActive() && !isStopRequested()) {
+            // clear cache for bulk reading
+            for (LynxModule module : this.hardwareMap.getAll(LynxModule.class)) {
+                module.clearBulkCache();
+            }
+
+            if (controller1.getdPadUp() == Controller.ButtonState.ON_PRESS) {
+                robot.slides.motor.setTargetPosition(robot.slides.motor.getTargetPosition() + 10);
+            }
+            if (controller1.getdPadDown() == Controller.ButtonState.ON_PRESS) {
+                robot.slides.motor.setTargetPosition(robot.slides.motor.getTargetPosition() - 10);
+            }
+            if (controller1.getdPadRight() == Controller.ButtonState.ON_PRESS) {
+                robot.lock.servo.setPosition(robot.lock.servo.getPosition() + 0.05);
+            }
+            if (controller1.getdPadLeft() == Controller.ButtonState.ON_PRESS) {
+                robot.lock.servo.setPosition(robot.lock.servo.getPosition() - 0.05);
+            }
+            if (controller1.getaButton() == Controller.ButtonState.ON_PRESS) {
+                robot.box.swing1.setPosition(robot.box.swing1.getPosition() + 0.05);
+                robot.box.swing2.setPosition(robot.box.swing2.getPosition() + 0.05);
+            }
+            if (controller1.getbButton() == Controller.ButtonState.ON_PRESS) {
+                robot.box.swing1.setPosition(robot.box.swing1.getPosition() - 0.05);
+                robot.box.swing2.setPosition(robot.box.swing2.getPosition() - 0.05);
+            }
+
+            if (controller1.getxButton() == Controller.ButtonState.ON_PRESS) {
+                robot.box.swing1.setPosition(1);
+                robot.box.swing2.setPosition(1);
+            }
+            if (controller1.getyButton() == Controller.ButtonState.ON_PRESS) {
+                robot.box.swing1.setPosition(0);
+                robot.box.swing2.setPosition(0);
+            }
+
+
+            //telemetry.addLine(vision.getBarcodePosition().name());
+            telemetry.addData("sensor Distance: ", robot.box.sensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("slides Position: ", robot.slides.motor.getCurrentPosition());
+            telemetry.update();
+        }
+    }
+}
+
+/*
+package org.firstinspires.ftc.teamcode.opmodes;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.lib.Controller;
 import org.firstinspires.ftc.teamcode.lib.Globals;
 import org.firstinspires.ftc.teamcode.lib.RobotTele;
@@ -77,3 +164,5 @@ public class Test extends LinearOpMode {
         }
     }
 }
+
+ */
