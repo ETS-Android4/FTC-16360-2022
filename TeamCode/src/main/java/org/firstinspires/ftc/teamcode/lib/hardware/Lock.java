@@ -14,7 +14,7 @@ public class Lock {
         INTAKING
     }
 
-    Servo lock;
+    public Servo servo;
 
 
     public State state = State.NEUTRAL;
@@ -25,7 +25,7 @@ public class Lock {
     public State depositDirection = State.LEFT;
 
     public Lock(HardwareMap hardwareMap) {
-        lock   = hardwareMap.get(Servo.class, "lock");
+        servo = hardwareMap.get(Servo.class, "lock");
 
         //Get Intake Side from Globals
         if (Globals.IntakeSide == Globals.Side.LEFT) {
@@ -38,16 +38,16 @@ public class Lock {
     public void update(){
         switch (state) {
             case LEFT:
-                lock.setPosition(lock_left);
+                servo.setPosition(lock_left);
                 break;
             case RIGHT:
-                lock.setPosition(lock_right);
+                servo.setPosition(lock_right);
                 break;
             case NEUTRAL:
-                lock.setPosition(lock_neutral);
+                servo.setPosition(lock_neutral);
                 break;
             case INTAKING:
-                lock.setPosition(lock_intaking);
+                servo.setPosition(lock_intaking);
                 break;
         }
     }

@@ -13,19 +13,22 @@ public class Box {
 
     enum State {
         EXTENDED,
-        RETRACTED
+        RETRACTED,
+        TRANSPORTING
     }
 
-    Servo swing1;
-    Servo swing2;
-    Rev2mDistanceSensor sensor;
+    public Servo swing1;
+    public Servo swing2;
+    public Rev2mDistanceSensor sensor;
 
 
     private State state = State.RETRACTED;
-    private double swing1_In = 0;
+    private double swing1_In = 0.1;
     private double swing1_Out = 1;
-    private double swing2_In = 0;
+    private double swing1_Trs = 0;
+    private double swing2_In = 0.1;
     private double swing2_Out = 1;
+    private double swing2_Trs = 0;
     boolean ready = true;
     public boolean full = false;
     ElapsedTime timer;
@@ -48,6 +51,12 @@ public class Box {
         timer.reset();
     }
 
+    public void transport() {
+        state = State.TRANSPORTING;
+        ready = false;
+        timer.reset();
+    }
+
     public void update(){
         switch (state) {
             case EXTENDED:
@@ -57,6 +66,10 @@ public class Box {
             case RETRACTED:
                 swing1.setPosition(swing1_In);
                 swing2.setPosition(swing2_In);
+                break;
+            case TRANSPORTING:
+                swing1.setPosition(swing1_Trs);
+                swing2.setPosition(swing2_Trs);
                 break;
         }
         if (timer.milliseconds() > 10) {

@@ -12,8 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.lib.Globals;
 import org.firstinspires.ftc.teamcode.lib.Vision;
-import org.firstinspires.ftc.teamcode.lib.hardware.Arm;
+import org.firstinspires.ftc.teamcode.lib.hardware.Lock;
 import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
+import org.firstinspires.ftc.teamcode.lib.hardware.Slides;
 import org.opencv.core.Mat;
 
 //@Disabled
@@ -26,8 +27,8 @@ public class Auto_Base_New{
         WHEELING,
         DUCK_TO_DEPOSIT,
         DEPOSIT,
-        INTAKE_ON,
         DEPOSIT_TO_TAKEIN,
+        TAKING_IN,
         TAKE_IN,
         TAKEIN_TO_DEPOSIT,
         PARK
@@ -49,6 +50,8 @@ public class Auto_Base_New{
     // Declare our start pose
     Pose2d startPose;
 
+    Pose2d takeinPose;
+
     // robot class
     Robot robot;
 
@@ -65,7 +68,7 @@ public class Auto_Base_New{
     Telemetry telemetry;
 
     //Trajectories
-    Trajectory startToDuck, duckToDeposit, depostToTakein, takeinToDeposit;
+    Trajectory startToDuck, duckToDeposit, depostToPark, takeinToDeposit;
     public Auto_Base_New(HardwareMap hardwareMap, Telemetry telemetry, StartPos startPos){
         //copy telemetry, startPos
         this.telemetry = telemetry;
@@ -108,11 +111,11 @@ public class Auto_Base_New{
                 .lineToLinearHeading(new Pose2d(-62.4, 20, Math.toRadians(270)))
                 .build();
 
-        depostToTakein = robot.drive.trajectoryBuilder(duckToDeposit.end())
-                .lineTo(new Vector2d(-62.4, 20))// Y koordinate stimmt nöd!!!
-                .build();
+       depostToPark = robot.drive.trajectoryBuilder(takeinToDeposit.end())
+               .lineTo(new Vector2d(-62.4, 20))//Y stimmt nonig!!!!!
+               .build();
 
-        takeinToDeposit = robot.drive.trajectoryBuilder(depostToTakein.end())
+        takeinToDeposit = robot.drive.trajectoryBuilder(takeinPose) ///eifach endposition vom hindere Fahre, ich weiss nonig wie das gaht
                 .lineTo(new Vector2d(-62.4, 20))//Y stimmt nöd!!!!
                 .build();
 
@@ -146,24 +149,40 @@ public class Auto_Base_New{
                 currentState = State.DEPOSIT;
                 break;
             case DEPOSIT:
-                // arm usefahre und denn ablade uf de richtige höchi
-                if (waitTimer.seconds() < 25){
-                    currentState = State.INTAKE_ON;
+                switch (barcodePos){
+                    case TOP:
+                        robot.slides.setExtendedPos(Slides.State.MAX);
+                        break;
+                    case MIDDLE:
+                        robot.slides.setExtendedPos(Slides.State.MEDIUM);
+                        break;
+                    case BOTTOM:
+                        robot.slides.setExtendedPos(Slides.State.MIN);
+                        break;
+                }
+                robot.lock.depositDirection = Lock.State.RIGHT;///vermuetlich mues mer überal bim ablade no states für pause ifüege!!!!
+                if (waitTimer.seconds() < 25) {
+                    currentState = State.DEPOSIT_TO_TAKEIN;
                 }
                 else{
                     currentState = State.PARK;
                 }
                 break;
-            case INTAKE_ON:
-                // intake aschalte und fürefahre
-                currentState = State.DEPOSIT_TO_TAKEIN;
-                break;
             case DEPOSIT_TO_TAKEIN:
-                robot.drive.followTrajectoryAsync(depostToTakein);
-                currentState = State.TAKE_IN;
+                robot.slides.setExtendedPos(Slides.State.ZERO);
+                robot.intake.enable();
+                robot.drive.setMotorPowers(10, 10, 10, 10); // stimmt no gar nonig
+                currentState = State.TAKING_IN;
                 break;
+            case TAKING_IN:
+                if (robot.box.full){
+                    currentState = State.TAKING_IN;
+                }
+
             case TAKE_IN:
-                //intake bis öppis drin isch
+                robot.intake.disable();
+                robot.drive.setMotorPowers(0,0,0,0);
+                takeinPose = robot.drive.getPoseEstimate();
                 currentState = State.TAKEIN_TO_DEPOSIT;
                 break;
             case TAKEIN_TO_DEPOSIT:
@@ -171,7 +190,8 @@ public class Auto_Base_New{
                 currentState=State.DEPOSIT;
                 break;
             case PARK:
-                robot.drive.followTrajectoryAsync(depostToTakein);
+                robot.slides.setExtendedPos(Slides.State.ZERO);
+                robot.drive.followTrajectoryAsync(depostToPark);
                 break;
         }
 
@@ -189,7 +209,6 @@ public class Auto_Base_New{
         telemetry.addData("y", poseEstimate.getY());
         telemetry.addData("heading", poseEstimate.getHeading());
         telemetry.addData("position", barcodePos);
-        telemetry.addData("armPos", robot.arm.armState);
         telemetry.addData("state", currentState);
         telemetry.update();
     }

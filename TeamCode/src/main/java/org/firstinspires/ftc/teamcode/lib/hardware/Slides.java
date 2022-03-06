@@ -30,11 +30,10 @@ public class Slides {
     public int offset = 0;
     public double speed = 0;
     public State extendedPos = State.MAX;
+    public State state = State.MIN;
 
 
     public Slides(HardwareMap hardwareMap) {
-
-        //sensor = hardwareMap.get(Rev2mDistanceSensor.class, "sensor");
         motor = hardwareMap.get(DcMotorEx.class, "slides");
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -53,6 +52,10 @@ public class Slides {
     }
 
     public void setpos(State state) {
+        this.state = state;
+    }
+
+    public void update() {
         switch (state) {
             case MAX:
                 motor.setTargetPosition(motor_max + offset);
@@ -68,10 +71,6 @@ public class Slides {
                 break;
         }
         motor.setPower(speed);
-    }
-
-    public void update() {
-
     }
 }
 /*
