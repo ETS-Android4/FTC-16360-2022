@@ -20,10 +20,10 @@ public class Auto_Blue_Outer extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // initialize auto
-        //base = new Auto_Base(hardwareMap, telemetry, Auto_Base.StartPos.BLUE_OUTER);
+        base = new Auto_Base(hardwareMap, telemetry, Auto_Base.StartPos.BLUE_OUTER);
 
         while(!isStarted() && !isStopRequested()) {
-            //telemetry.addData("pp", base.vision.getBarcodePosition());
+            telemetry.addData("pp", base.vision.getBarcodePosition());
             telemetry.update();
         }
 
@@ -37,7 +37,7 @@ public class Auto_Blue_Outer extends LinearOpMode {
                 module.clearBulkCache();
             }
 
-            //base.update();
+            base.update();
         }
     }
     //Globals.currentPose = base.robot.drive.getPoseEstimate();

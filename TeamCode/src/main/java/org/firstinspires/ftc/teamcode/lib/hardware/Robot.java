@@ -31,7 +31,7 @@ public class Robot {
 
     public SampleMecanumDrive drive;
     public Slides slides;
-    //public Spinner spinner;
+    public Spinner spinner;
     public Box box;
     public Lock lock;
     public Intake intake;
@@ -43,12 +43,11 @@ public class Robot {
         this.hardwareMap = hardwareMap;
 
         //pass HardwareMap to hardware classes, initialize
-        //spinner = new Spinner(hardwareMap);
+        spinner = new Spinner(hardwareMap);
         slides = new Slides(hardwareMap);
+        box = new Box(hardwareMap);
         lock = new Lock(hardwareMap);
         intake = new Intake(hardwareMap);
-        box = new Box(hardwareMap);
-        drive = new SampleMecanumDrive(hardwareMap);
 
         // set robot pose
         drive.setPoseEstimate(Globals.currentPose);
@@ -125,7 +124,7 @@ public class Robot {
 
         // We update hardware classes continuously in the background, regardless of state
         drive.update();
-        //spinner.update();
+        spinner.update();
         box.update();
         lock.update();
         intake.update();
