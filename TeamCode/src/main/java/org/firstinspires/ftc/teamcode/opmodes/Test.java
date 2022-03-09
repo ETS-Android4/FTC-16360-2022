@@ -59,11 +59,11 @@ public class Test extends LinearOpMode {
             }
             if (controller1.getaButton() == Controller.ButtonState.ON_PRESS) {
                 robot.box.swing1.setPosition(robot.box.swing1.getPosition() + 0.05);
-                robot.box.swing2.setPosition(robot.box.swing2.getPosition() + 0.05);
+                robot.box.swing2.setPosition(robot.box.swing2.getPosition() - 0.05);
             }
             if (controller1.getbButton() == Controller.ButtonState.ON_PRESS) {
                 robot.box.swing1.setPosition(robot.box.swing1.getPosition() - 0.05);
-                robot.box.swing2.setPosition(robot.box.swing2.getPosition() - 0.05);
+                robot.box.swing2.setPosition(robot.box.swing2.getPosition() + 0.05);
             }
 
             if (controller1.getxButton() == Controller.ButtonState.ON_PRESS) {
@@ -79,6 +79,8 @@ public class Test extends LinearOpMode {
             //telemetry.addLine(vision.getBarcodePosition().name());
             telemetry.addData("sensor Distance: ", robot.box.sensor.getDistance(DistanceUnit.CM));
             telemetry.addData("slides Position: ", robot.slides.motor.getCurrentPosition());
+            telemetry.addData("box 1: ", robot.box.swing1.getPosition());
+            telemetry.addData("box 2: ", robot.box.swing2.getPosition());
             telemetry.update();
         }
     }
