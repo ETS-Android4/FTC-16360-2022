@@ -13,29 +13,29 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.lib.Controller;
 import org.firstinspires.ftc.teamcode.lib.Globals;
 import org.firstinspires.ftc.teamcode.lib.RobotTele;
-import org.firstinspires.ftc.teamcode.lib.Vision;
+//import org.firstinspires.ftc.teamcode.lib.Vision;
 import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
+import org.firstinspires.ftc.teamcode.lib.hardware.Slides;
 
 
 @TeleOp(group = "advanced", name = "test")
-
 public class Test extends LinearOpMode {
 
-    private DcMotor slides;
-
-    private DcMotor intake;
-
     private ElapsedTime runtime = new ElapsedTime();
+    public Robot robot;
+    public Controller controller1;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Robot robot = new Robot(hardwareMap);
-        Controller controller1 = new Controller(gamepad1);
-
-        robot.slides.speed = 0.8;
+        robot = new Robot(hardwareMap);
+        boolean b = false;
+        int i = 0;
+        controller1 = new Controller(gamepad1);
 
         waitForStart();
+        robot.slides.motor.setPower(0.8);
+        robot.intake.singleServo.setPosition(0.8);
 
         if (isStopRequested()) return;
 
@@ -46,10 +46,14 @@ public class Test extends LinearOpMode {
             }
 
             if (controller1.getdPadUp() == Controller.ButtonState.ON_PRESS) {
-                robot.slides.motor.setTargetPosition(robot.slides.motor.getTargetPosition() + 10);
+                robot.box.swing2.setPosition(1);
+                robot.box.swing1.setPosition(0.04);
+                robot.box.retract();
             }
             if (controller1.getdPadDown() == Controller.ButtonState.ON_PRESS) {
-                robot.slides.motor.setTargetPosition(robot.slides.motor.getTargetPosition() - 10);
+                robot.box.swing2.setPosition(0);
+                robot.box.swing1.setPosition(1);
+                robot.box.extend();
             }
             if (controller1.getdPadRight() == Controller.ButtonState.ON_PRESS) {
                 robot.lock.servo.setPosition(robot.lock.servo.getPosition() + 0.05);
@@ -58,28 +62,41 @@ public class Test extends LinearOpMode {
                 robot.lock.servo.setPosition(robot.lock.servo.getPosition() - 0.05);
             }
             if (controller1.getaButton() == Controller.ButtonState.ON_PRESS) {
-                robot.box.swing1.setPosition(robot.box.swing1.getPosition() + 0.05);
+                robot.box.swing1.setPosition(robot.box.swing1.getPosition() - 0.05);
                 robot.box.swing2.setPosition(robot.box.swing2.getPosition() + 0.05);
             }
             if (controller1.getbButton() == Controller.ButtonState.ON_PRESS) {
-                robot.box.swing1.setPosition(robot.box.swing1.getPosition() - 0.05);
+                robot.box.swing1.setPosition(robot.box.swing1.getPosition() + 0.05);
                 robot.box.swing2.setPosition(robot.box.swing2.getPosition() - 0.05);
             }
 
             if (controller1.getxButton() == Controller.ButtonState.ON_PRESS) {
-                robot.box.swing1.setPosition(1);
-                robot.box.swing2.setPosition(1);
+                robot.intake.singleServo.setPosition(robot.intake.singleServo.getPosition() + 0.05);
             }
             if (controller1.getyButton() == Controller.ButtonState.ON_PRESS) {
-                robot.box.swing1.setPosition(0);
-                robot.box.swing2.setPosition(0);
+                robot.intake.singleServo.setPosition(robot.intake.singleServo.getPosition() + 0.05);
             }
+            if (controller1.getRightBumper() == Controller.ButtonState.ON_PRESS) {
+                //robot.slides.setpos(Slides.State.MIN);
+            }
+            if (controller1.getLeftBumper() == Controller.ButtonState.ON_PRESS) {
+                robot.intake.deploy();
+            }
+            i++;
 
 
             //telemetry.addLine(vision.getBarcodePosition().name());
             telemetry.addData("sensor Distance: ", robot.box.sensor.getDistance(DistanceUnit.CM));
             telemetry.addData("slides Position: ", robot.slides.motor.getCurrentPosition());
+            telemetry.addData("box servo position 1: ", robot.box.swing1.getPosition());
+            telemetry.addData("box servo position 2: ", robot.box.swing2.getPosition());
+            telemetry.addData("slides Target: ", robot.slides.motor.getTargetPosition());
+            telemetry.addData("lock position ", robot.lock.servo.getPosition());
+            telemetry.addData("i: ",i);
+            telemetry.addData("joystick: ", controller1.getLeftJoystickXValue());
             telemetry.update();
+            controller1.update();
+            robot.update();
         }
     }
 }

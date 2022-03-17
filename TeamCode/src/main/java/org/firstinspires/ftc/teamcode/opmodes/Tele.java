@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.lib.Globals;
 import org.firstinspires.ftc.teamcode.lib.RobotTele;
+import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(group = "advanced")
@@ -23,6 +25,7 @@ public class Tele extends LinearOpMode {
         robot = new RobotTele(hardwareMap, gamepad1, gamepad2);
 
         waitForStart();
+        robot.state = Robot.State.INTAKING;
 
         if (isStopRequested()) return;
 
@@ -36,6 +39,14 @@ public class Tele extends LinearOpMode {
             robot.update();
 
             //Telemetry
+            telemetry.addData("power: ", robot.slides.motor.getPower());
+            telemetry.addData("c: ", robot.box.c);
+            telemetry.addData("timer: ", robot.timer.milliseconds());
+            telemetry.addData("state: ", robot.state);
+            telemetry.addData("slides state: ", robot.slides.state);
+            telemetry.addData("box ready: ", robot.box.ready);
+            telemetry.addData("box timer: ", robot.box.timer.milliseconds());
+            telemetry.addData("slides position: ", robot.slides.motor.getCurrentPosition());
             telemetry.update();
         }
     }

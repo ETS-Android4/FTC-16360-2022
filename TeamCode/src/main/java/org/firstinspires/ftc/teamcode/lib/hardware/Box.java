@@ -11,10 +11,11 @@ import org.firstinspires.ftc.teamcode.lib.Globals;
 
 public class Box {
 
-    enum State {
-        EXTENDED,
+    public enum State {
+        MAX,
         RETRACTED,
-        TRANSPORTING
+        TRANSPORTING,
+        MEDIUM
     }
 
     public Servo swing1;
@@ -23,25 +24,39 @@ public class Box {
 
 
     private State state = State.RETRACTED;
-    private double swing1_In = 0.1;
-    private double swing1_Out = 1;
+
+    private double swing1_In = 0.03;
+    private double swing1_Out = 0.56;
+    private double swing1_Med = 0.38;
     private double swing1_Trs = 0;
-    private double swing2_In = 0.1;
-    private double swing2_Out = 1;
-    private double swing2_Trs = 0;
-    boolean ready = true;
+
+    private double swing2_In = 0.97;
+    private double swing2_Out = 0.44;
+    private double swing2_Med = 0.62;
+    private double swing2_Trs = 1;
+
+    public boolean ready = true;
+    public double c = 0;
+    double sensorThreshold = 8;
     public boolean full = false;
-    ElapsedTime timer;
+    public ElapsedTime timer;
+    private State extendedPos = State.MAX;
 
     public Box(HardwareMap hardwareMap) {
         swing1 = hardwareMap.get(Servo.class, "swing1");
         swing2 = hardwareMap.get(Servo.class, "swing2");
+        sensor = hardwareMap.get(Rev2mDistanceSensor.class, "sensor");
+        timer = new ElapsedTime();
     }
 
     public void extend() {
-        state = State.EXTENDED;
+        state = extendedPos;
         ready = false;
         timer.reset();
+    }
+
+    public void setExtendedPos(State state){
+        extendedPos = state;
     }
 
     public void retract() {
@@ -58,23 +73,34 @@ public class Box {
 
     public void update(){
         switch (state) {
-            case EXTENDED:
+            case MAX:
                 swing1.setPosition(swing1_Out);
                 swing2.setPosition(swing2_Out);
+                c = 0;
                 break;
             case RETRACTED:
                 swing1.setPosition(swing1_In);
                 swing2.setPosition(swing2_In);
+                if (sensor.getDistance(DistanceUnit.CM) < sensorThreshold) {
+                    c++;
+                } else {
+                    c = 0;
+                }
                 break;
             case TRANSPORTING:
                 swing1.setPosition(swing1_Trs);
                 swing2.setPosition(swing2_Trs);
                 break;
+            case MEDIUM:
+                swing1.setPosition(swing1_Med);
+                swing2.setPosition(swing2_Med);
+                c = 0;
+                break;
         }
-        if (timer.milliseconds() > 10) {
+        if (timer.milliseconds() > 450) {
             ready = true;
         }
-        if (sensor.getDistance(DistanceUnit.CM) < 2) {
+        if (c > 15) {
             full = true;
         } else {
             full = false;

@@ -23,7 +23,7 @@ public class Auto_Blue_Inner extends LinearOpMode {
         base = new Auto_Base_New(hardwareMap, telemetry, Auto_Base_New.StartPos.BLUE_INNER);
 
         while(!isStarted() && !isStopRequested()) {
-            telemetry.addData("pp", base.vision.getBarcodePosition());
+            //telemetry.addData("pp", base.vision.getBarcodePosition());
             telemetry.update();
         }
 

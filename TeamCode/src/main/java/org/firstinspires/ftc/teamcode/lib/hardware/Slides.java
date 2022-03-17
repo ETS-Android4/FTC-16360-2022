@@ -18,59 +18,82 @@ public class Slides {
         MAX,
         ZERO,
         MIN,
+        SAFETY,
         MEDIUM
     }
 
     public DcMotorEx motor;
 
-    final int motor_max = 770;
-    final int motor_medium = 770;
-    final int motor_min = 770;
+    final int motor_max = 956;
+    final int motor_medium = 390;
+    final int motor_min = 145;
+    final int motor_safe = 310;
     final int motor_retracted = 0;
+    final double speed_in = 0.5;
+    final double speed_out = 1;
+    private double speed = 0.75;
+    private double p = 0;
     public int offset = 0;
-    public double speed = 0;
     public State extendedPos = State.MAX;
-    public State state = State.MIN;
+    public State state = State.ZERO;
 
 
     public Slides(HardwareMap hardwareMap) {
         motor = hardwareMap.get(DcMotorEx.class, "slides");
+        motor.setTargetPosition(0);
         motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void extend() {
-        setpos(extendedPos);
+        p = 10;
+        state = extendedPos;
+        speed = speed_out;
     }
 
     public void retract() {
-        setpos(State.ZERO);
+        p = 10;
+        state = State.ZERO;
+        speed = speed_in;
     }
+
+    public void safeEx() {
+        p = 10;
+        state = State.SAFETY;
+        speed = speed_out;
+    }
+
+    public void safeRe() {
+        p = 10;
+        state = State.SAFETY;
+        speed = speed_in;
+    }
+
 
     public void setExtendedPos(State pos) {
         extendedPos = pos;
     }
 
-    public void setpos(State state) {
-        this.state = state;
-    }
-
     public void update() {
+        motor.setPower(speed);
+        motor.setPositionPIDFCoefficients(p);
         switch (state) {
             case MAX:
                 motor.setTargetPosition(motor_max + offset);
                 break;
             case ZERO:
-                motor.setTargetPosition(motor_retracted + offset);
+                motor.setTargetPosition(motor_retracted);
                 break;
             case MEDIUM:
                 motor.setTargetPosition(motor_medium + offset);
+                break;
+            case SAFETY:
+                motor.setTargetPosition(motor_safe + offset);
                 break;
             case MIN:
                 motor.setTargetPosition(motor_min + offset);
                 break;
         }
-        motor.setPower(speed);
     }
 }
 /*

@@ -21,11 +21,14 @@ public class Robot {
         RETRACTING,
         DEPOSITING,
         EXTENDED,
-        VIBING
+        VIBING,
+        TRANSITION
     }
 
     public State state;
+    public State transition;
     public ElapsedTime timer;
+    public ElapsedTime stateTimer;
 
     protected HardwareMap hardwareMap;
 
@@ -36,8 +39,14 @@ public class Robot {
     public Lock lock;
     public Intake intake;
     public boolean automation = true; //Set to false to disable automatic state transitions
+    public boolean autoextend = true;
+    public String temp = "";
 
     protected Pose2d poseEstimate = new Pose2d();
+
+    boolean firstTime = true;
+    boolean once = true;
+    int statePart = 0;
 
     public Robot(HardwareMap hardwareMap) {
         this.hardwareMap = hardwareMap;
@@ -45,9 +54,14 @@ public class Robot {
         //pass HardwareMap to hardware classes, initialize
         spinner = new Spinner(hardwareMap);
         slides = new Slides(hardwareMap);
-        box = new Box(hardwareMap);
         lock = new Lock(hardwareMap);
         intake = new Intake(hardwareMap);
+        box = new Box(hardwareMap);
+        drive = new SampleMecanumDrive(hardwareMap);
+        timer = new ElapsedTime();
+        stateTimer = new ElapsedTime();
+        state = State.IDLE;
+        transition = State.IDLE;
 
         // set robot pose
         drive.setPoseEstimate(Globals.currentPose);
@@ -61,65 +75,97 @@ public class Robot {
         }
     }
 
-    public void extendArm() {state = State.EXTENDED;}
+    public void transitionState(State state) {
+        transition = state;
+    }
 
-    public void retractArm() {state = State.RETRACTING;}
+    public void extend() {transitionState(State.EXTENDING);}
 
-    public void deposit() {state = State.DEPOSITING;}
+    public void retract() {transitionState(State.RETRACTING);}
+
+    public void deposit() {transitionState(State.DEPOSITING);}
 
     public void update() {
 
         switch (state) {
             case EXTENDING:
-                intake.disable();
-                slides.speed = 1;
-                slides.extend();
-                lock.state = Lock.State.NEUTRAL;
-                if (slides.motor.getCurrentPosition() > 10) {
-                    box.extend();
-                } else {
-                    box.transport();
+                if (statePart == 3 && box.ready) {
+                    slides.extend();
+                    transitionState(State.DRIVING);
                 }
-                if (slides.motor.getCurrentPosition() >= slides.motor.getTargetPosition()) {
-                    state = State.DRIVING;
+                if (statePart == 2 && slides.motor.getCurrentPosition() > slides.motor_safe-90) {
+                    box.extend();
+                    if(slides.extendedPos != Slides.State.MIN) {
+                        slides.extend();
+                        transitionState(State.DRIVING);
+                    }
+                    statePart++;
+                }
+                if (statePart == 1 && box.ready) {
+                    slides.safeEx();
+                    statePart++;
+                }
+                if (statePart == 0) {
+                    box.transport();
+                    intake.disable();
+                    lock.state = Lock.State.NEUTRAL;
+                    statePart++;
                 }
                 break;
 
             case RETRACTING:
-                lock.state = Lock.State.NEUTRAL;
-                slides.speed = 0.8;
-                box.transport();
-                if (box.ready) {
+                if (statePart > 1 && slides.motor.getCurrentPosition() <= 35) {
+                    if (automation) {
+                        transitionState(State.INTAKING);
+                        timer.reset();
+                    } else {
+                        transitionState(State.DRIVING);
+                    }
+                }
+                if (statePart > 1 && box.ready && stateTimer.milliseconds() > 320) {
                     slides.retract();
                 }
-                if (slides.motor.getCurrentPosition() <= 10) {
-                    if (automation) {
-                        state = State.INTAKING;
-                    } else {
-                        state = State.DRIVING;
-                    }
-                    box.retract();
+                if (statePart == 1 && stateTimer.milliseconds() > 200) {
+                    box.transport();
+                    statePart++;
+                }
+                if (statePart == 0) {
+                    lock.state = Lock.State.NEUTRAL;
+                    slides.safeRe();
+                    statePart++;
                 }
                 break;
 
             case DEPOSITING:
                 lock.state = lock.depositDirection;
-                if(timer.milliseconds() > 10 && !box.full && automation) {
-                    state = State.RETRACTING;
+                if(stateTimer.milliseconds() > 300 && automation) {
+                    transitionState(State.RETRACTING);
                 }
                 break;
 
             case INTAKING:
+                if (timer.milliseconds() > 150) {
+                    box.retract();
+                }
                 lock.state = Lock.State.INTAKING;
                 intake.enable();
-                if(box.full && automation) {
-                    state = State.EXTENDING;
+                if(box.full && automation && autoextend) {
+                    transitionState(State.EXTENDING);
                 }
                 break;
 
             case DRIVING:
                 intake.disable();
                 break;
+        }
+
+        //transition between states
+        if (transition != State.TRANSITION) {
+            statePart = 0;
+            state = transition;
+            stateTimer.reset();
+            transition = State.TRANSITION;
+            firstTime = true;
         }
 
         // We update hardware classes continuously in the background, regardless of state
@@ -131,3 +177,4 @@ public class Robot {
         slides.update();
     }
 }
+

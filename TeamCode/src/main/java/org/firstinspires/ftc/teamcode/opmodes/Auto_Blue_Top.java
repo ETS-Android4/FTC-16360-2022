@@ -12,24 +12,28 @@ import org.firstinspires.ftc.teamcode.lib.hardware.Robot;
 
 //@Disabled
 @Autonomous(group = "opmodes")
-public class Auto_Red_Inner extends LinearOpMode {
+public class Auto_Blue_Top extends LinearOpMode {
 
-    Auto_Base base;
+    Auto_Base_New base;
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         // initialize auto
-        //base = new Auto_Base(hardwareMap, telemetry, Auto_Base.StartPos.RED_INNER);
+        base = new Auto_Base_New(hardwareMap, telemetry, Auto_Base_New.StartPos.BLUE_OUTER);
 
         while(!isStarted() && !isStopRequested()) {
             //telemetry.addData("pp", base.vision.getBarcodePosition());
             telemetry.update();
+            telemetry.addData("pos: ", String.valueOf(base.barcodePos));
+            base.barcodePos = Globals.BarcodePos.TOP;
         }
 
         waitForStart();
 
         if (isStopRequested()) return;
+
+        base.init();
 
         while(opModeIsActive() && !isStopRequested()) {
             // clear cache for bulk reading
@@ -37,7 +41,8 @@ public class Auto_Red_Inner extends LinearOpMode {
                 module.clearBulkCache();
             }
 
-            //base.update();
+            base.update();
+            base.robot.update();
         }
     }
     //Globals.currentPose = base.robot.drive.getPoseEstimate();
